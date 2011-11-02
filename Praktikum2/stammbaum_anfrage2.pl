@@ -28,3 +28,6 @@ lex(der,der,artikel,_).
 lex(die,die,artikel,_).
 lex(das,das,artikel,_).
 lex(von,von,xxx,_).
+
+%% ANFRAGE!!!!
+%% s(Semantik, [ist,hans,das,kind,von,peter],[])

@@ -11,7 +11,7 @@ ist_frage([SemSubj,SemPraed,SemObj]) --> subj(SemSubj,N), praed_phrase(SemPraed,
 subj(SemSubj,N) --> nomen(SemSubj,N).
 nomen(SemNomen,N) --> [X], {lex(X,SemNomen,nomen,N)}.
 
-praed_phrase(SemPraed,N) --> artikel(_,N), pread(SemPraed,N).
+praed_phrase(SemPraed,N) --> artikel(_,N), praed(SemPraed,N).
 praed(SemPraed,N) --> [X], {lex(X,SemPraed,pnomen,N)}. %'pnomen' ist Nomen, fuer die wir Preadikate definiert haben (kind/2, mutter/2,...)
 artikel(_,N) --> [X], {lex(X,_,artikel,N)}.
 
