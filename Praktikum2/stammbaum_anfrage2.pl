@@ -3,6 +3,8 @@
 
 :- ensure_loaded(readsentence).
 
+start :- read_sentence(Satz), s(Semantik,Satz,[?]).
+
 s(SemS) --> ist(_), ist_frage(SemS).
 ist(_) --> [ist], {lex(ist,_,verb,_)}.
 
