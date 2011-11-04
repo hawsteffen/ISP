@@ -10,23 +10,43 @@ start :-
       %write('Struktur: '), write(Struktur), nl, % Nur zum Debuggen!!!
       stammbaum_fragen(Semantik).
 
+% Anfrage an den Stammbaum stellen
+% ---------------------------------
+% Wenn das erste Argument eine ungebundene Variable ist,
+% wird das Prädikat ausgeführt (call) und die belegte
+% Variable am Schluss ausgegeben (als Antwort auf eine Wer-ist-Frage)
 stammbaum_fragen([Funktor,Arg1,Arg2]) :- var(Arg1), Struktur =.. [Funktor,Arg1,Arg2], call(Struktur),!, writeln(Arg1).
-stammbaum_fragen([Funktor,Arg1,Arg2]) :- var(Arg2), Struktur =.. [Funktor,Arg1,Arg2], call(Struktur),!, writeln(Arg2).
+
+% Wenn alle Variablen gebunden sind (ist-Frage), wird das Prädikat
+% ausgeführt und, wenn die Anfrage positiv beantwortet wurde, 'Ja' ausgegeben
 stammbaum_fragen(Semantik) :- Struktur =.. Semantik, call(Struktur),!, writeln('JA!').
+
+% Sonst 'Nein' als Antwort ausgeben
 stammbaum_fragen(_) :- writeln('Nein!').
       
+% Liest einen Satz vom Benutzer von der Eingabezeile.
 frage_lesen(Satz) :- read_sentence(Satz).
+
+% Pruefen, ob die Frage korrekt formuliert wurde (mit der Gramatik
+% erzeugt werden kann)
 frage_verarbeiten(Satz,Semantik) :- frage(Semantik,Satz,[?]).
 
+% Unterscheidung, ob Frage eine Ist-Frage, Wer-ist-Frage
+% oder etwas anderes ist.
 frage(Semantik) --> ist_frage(Semantik).
 frage(Semantik) --> wer_ist_frage(Semantik).
+frage(_) --> {writeln('ich habe keine ahnung.')}.
 
+% Verarbeitung der Wer-ist-Frage
 wer_ist_frage([SemPraed,_,SemObj]) --> wer_ist, praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
 wer_ist --> [wer,ist], {lex(wer_ist,_,verb,_)}.
 
+% Verarbeitung der Ist-Frage
 ist_frage([SemPraed,SemSubj,SemObj]) --> ist, subj(SemSubj,N), praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
 ist --> [ist], {lex(ist,_,verb,_)}.
 
+% Definition der Gramatik
+% ------------------------
 subj(SemSubj,N) --> nomen(SemSubj,N).
 nomen(SemNomen,N) --> [X], {lex(X,SemNomen,nomen,N)}.
 
