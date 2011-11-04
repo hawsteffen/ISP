@@ -2,10 +2,18 @@
 % Datum: 02.11.2011
 
 :- ensure_loaded(readsentence).
+:- ensure_loaded(stammbaum).
 
-start(Semantik) :- read_sentence(Satz), s(Semantik,Satz,[?]).
+start :-
+      frage(F),
+      frage_stammbaum(F).
 
-s(SemS) --> ist(_), ist_frage(Sem), {SemS =.. Sem}.
+frage_stammbaum(F) :- call(F),!, writeln('JA!').
+frage_stammbaum(_) :- writeln('Nein!').
+      
+frage(Funkt) :- read_sentence(Satz), s(Funkt,Satz,[?]).
+
+s(Funkt) --> ist(_), ist_frage(Sem), {Funkt =.. Sem}.
 ist(_) --> [ist], {lex(ist,_,verb,_)}.
 
 ist_frage([SemPraed,SemSubj,SemObj]) --> subj(SemSubj,N), praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
@@ -24,7 +32,7 @@ obj(SemObj,N) --> [X], {lex(X,SemObj,nomen,N)}.
 lex(hans,hans,nomen,sg).
 lex(peter,peter,nomen,sg).
 lex(ist,ist,verb,sg).
-lex(kind,kind,pnomen,sg).
+lex(kind,ist_kind,pnomen,sg).
 lex(ein,ein,artikel,_).
 lex(der,der,artikel,_).
 lex(die,die,artikel,_).

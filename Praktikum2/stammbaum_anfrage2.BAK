@@ -2,11 +2,21 @@
 % Datum: 02.11.2011
 
 :- ensure_loaded(readsentence).
+:- ensure_loaded(stammbaum).
 
-s(SemS) --> ist(_), ist_frage(SemS).
+start :-
+      frage(F),
+      frage_stammbaumm(F).
+
+frage_stammbaum(F) :- call(F),!, writeln('JA!').
+frage_stammbaum(_) :- writeln('Nein!').
+      
+frage(Funkt) :- read_sentence(Satz), s(Funkt,Satz,[?]).
+
+s(Funkt) --> ist(_), ist_frage(Sem), {Funkt =.. Sem}.
 ist(_) --> [ist], {lex(ist,_,verb,_)}.
 
-ist_frage([SemSubj,SemPraed,SemObj]) --> subj(SemSubj,N), praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
+ist_frage([SemPraed,SemSubj,SemObj]) --> subj(SemSubj,N), praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
 
 subj(SemSubj,N) --> nomen(SemSubj,N).
 nomen(SemNomen,N) --> [X], {lex(X,SemNomen,nomen,N)}.
@@ -15,16 +25,16 @@ praed_phrase(SemPraed,N) --> artikel(_,N), praed(SemPraed,N).
 praed(SemPraed,N) --> [X], {lex(X,SemPraed,pnomen,N)}. %'pnomen' ist Nomen, fuer die wir Preadikate definiert haben (kind/2, mutter/2,...)
 artikel(_,N) --> [X], {lex(X,_,artikel,N)}.
 
-obj_phrase(SemObj,N) --> xxx(_,N), obj(SemObj,N).
-xxx(_,N) --> [X], {lex(X,_,xxx,N)}.
+obj_phrase(SemObj,N) --> praeposition(_,N), obj(SemObj,N).
+praeposition(_,N) --> [X], {lex(X,_,praeposition,N)}.
 obj(SemObj,N) --> [X], {lex(X,SemObj,nomen,N)}.
 
 lex(hans,hans,nomen,sg).
 lex(peter,peter,nomen,sg).
 lex(ist,ist,verb,sg).
-lex(verheiratet,verheiratet,adjektiv,_).
-lex(kind,kind,pnomen,sg).
+lex(kind,ist_kind,pnomen,sg).
+lex(ein,ein,artikel,_).
 lex(der,der,artikel,_).
 lex(die,die,artikel,_).
 lex(das,das,artikel,_).
-lex(von,von,xxx,_).
+lex(von,von,praeposition,_).
