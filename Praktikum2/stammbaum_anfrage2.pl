@@ -5,16 +5,27 @@
 :- ensure_loaded(stammbaum).
 
 start :-
-      frage(F),
-      frage_stammbaum(F).
+      frage_lesen(Struktur),
+      %write('Struktur: '), write(Struktur), nl, % Nur zum Debuggen!!!
+      stammbaum_fragen(Struktur).
 
-frage_stammbaum(F) :- call(F),!, writeln('JA!').
-frage_stammbaum(_) :- writeln('Nein!').
+stammbaum_fragen([Funktor,Arg1,Arg2]) :- var(Arg1), Struktur =.. [Funktor,Arg1,Arg2], call(Struktur),!, writeln(Arg1).
+stammbaum_fragen([Funktor,Arg1,Arg2]) :- var(Arg2), Struktur =.. [Funktor,Arg1,Arg2], call(Struktur),!, writeln(Arg2).
+stammbaum_fragen(Semantik) :- Struktur =.. Semantik, call(Struktur),!, writeln('JA!').
+stammbaum_fragen(_) :- writeln('Nein!').
       
-frage(Funkt) :- read_sentence(Satz), s(Funkt,Satz,[?]).
+frage_lesen(Semantik) :- read_sentence(Satz), s(Semantik,Satz,[?]).
 
-s(Funkt) --> ist(_), ist_frage(Sem), {Funkt =.. Sem}.
-ist(_) --> [ist], {lex(ist,_,verb,_)}.
+s(Semantik) --> ist, ist_frage(Semantik).
+
+s(Semantik) --> wer_ist, wer_ist_frage(Semantik).
+
+wer_ist --> [wer,ist], {lex(wer_ist,_,verb,_)}.
+
+wer_ist_frage([SemPraed,_,SemObj]) --> praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
+
+
+ist --> [ist], {lex(ist,_,verb,_)}.
 
 ist_frage([SemPraed,SemSubj,SemObj]) --> subj(SemSubj,N), praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
 
@@ -31,6 +42,7 @@ obj(SemObj,N) --> [X], {lex(X,SemObj,nomen,N)}.
 
 lex(hans,hans,nomen,sg).
 lex(peter,peter,nomen,sg).
+lex(wer_ist,wer_ist,verb,sg).
 lex(ist,ist,verb,sg).
 lex(kind,ist_kind,pnomen,sg).
 lex(ein,ein,artikel,_).
