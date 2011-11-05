@@ -26,6 +26,8 @@ ist_kind(klaus,gert).
 ist_kind(klaus,maggy).
 ist_kind(egon,gert).
 ist_kind(egon,maggy).
+ist_kind(gert,peter).
+ist_kind(gert,petra).
 
 sind_verheiratet(mona,klaus).
 sind_verheiratet(klaus,mona).
@@ -95,6 +97,8 @@ sind_halbgeschwister(HS,Ich):-
 ist_schwager(Schwager,Ich):-
   sind_geschwister(Ich,X),
   sind_verheiratet(Schwager,X).
+
+ist_schwager(X,Y) :- ist_schwager(Y,X).
 
 %-----------------------------------------
 ist_schwippschwager(SSchwager,Ich):-

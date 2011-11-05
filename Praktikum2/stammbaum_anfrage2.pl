@@ -13,14 +13,15 @@ start :-
 % ----------------------------------
 % Anfrage an den Stammbaum stellen |
 % ----------------------------------
-% Wenn das erste Argument eine ungebundene Variable ist,
-% wird das Prädikat ausgeführt (call) und die belegte
-% Variable am Schluss ausgegeben (als Antwort auf eine Wer-ist-Frage)
+% Wenn ein Argument eine ungebundene Variable ist,
+% wird das Prädikat ausgeführt (call) und die dann gebundene
+% Variable ausgegeben (als Antwort auf eine Wer-ist-Frage)
 stammbaum_fragen([Funktor,Arg1,Arg2]) :- var(Arg1), Struktur =.. [Funktor,Arg1,Arg2], call(Struktur),!, writeln(Arg1).
+stammbaum_fragen([_,Arg1,_]) :- var(Arg1), writeln('Das weiß ich nicht...').
 
 % Wenn alle Variablen gebunden sind (ist-Frage), wird das Prädikat
 % ausgeführt und, wenn die Anfrage positiv beantwortet wurde, 'Ja' ausgegeben
-stammbaum_fragen(Semantik) :- Struktur =.. Semantik, call(Struktur),!, writeln('JA!').
+stammbaum_fragen(Semantik) :- Struktur =.. Semantik, call(Struktur),!, writeln('Ja!').
 
 % Sonst 'Nein' als Antwort ausgeben
 stammbaum_fragen(_) :- writeln('Nein!').
@@ -36,7 +37,7 @@ frage_verarbeiten(Satz,Semantik) :- frage(Semantik,Satz,[?]).
 % oder etwas anderes ist.
 frage(Semantik) --> ist_frage(Semantik).
 frage(Semantik) --> wer_ist_frage(Semantik).
-frage(_) --> {writeln('ich habe keine ahnung.')}.
+frage(_) --> {writeln('Das weiß ich nicht...')}.
 
 % Verarbeitung der Wer-ist-Frage
 wer_ist_frage([SemPraed,_,SemObj]) --> wer_ist, praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
