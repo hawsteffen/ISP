@@ -10,8 +10,9 @@ start :-
       %write('Struktur: '), write(Struktur), nl, % Nur zum Debuggen!!!
       stammbaum_fragen(Semantik).
 
-% Anfrage an den Stammbaum stellen
-% ---------------------------------
+% ----------------------------------
+% Anfrage an den Stammbaum stellen |
+% ----------------------------------
 % Wenn das erste Argument eine ungebundene Variable ist,
 % wird das Prädikat ausgeführt (call) und die belegte
 % Variable am Schluss ausgegeben (als Antwort auf eine Wer-ist-Frage)
@@ -45,24 +46,51 @@ wer_ist --> [wer,ist], {lex(wer_ist,_,verb,_)}.
 ist_frage([SemPraed,SemSubj,SemObj]) --> ist, subj(SemSubj,N), praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
 ist --> [ist], {lex(ist,_,verb,_)}.
 
-% Definition der Gramatik
-% ------------------------
+% -------------------------
+% Definition der Gramatik |
+% -------------------------
 subj(SemSubj,N) --> nomen(SemSubj,N).
 nomen(SemNomen,N) --> [X], {lex(X,SemNomen,nomen,N)}.
 
 praed_phrase(SemPraed,N) --> artikel(_,N), praed(SemPraed,N).
-praed(SemPraed,N) --> [X], {lex(X,SemPraed,pnomen,N)}. %'pnomen' ist Nomen, fuer die wir Preadikate definiert haben (kind/2, mutter/2,...)
+praed(SemPraed,N) --> [X], {lex(X,SemPraed,praedikat,N)}.
 artikel(_,N) --> [X], {lex(X,_,artikel,N)}.
 
 obj_phrase(SemObj,N) --> praeposition(_,N), obj(SemObj,N).
 praeposition(_,N) --> [X], {lex(X,_,praeposition,N)}.
 obj(SemObj,N) --> [X], {lex(X,SemObj,nomen,N)}.
 
-lex(hans,hans,nomen,sg).
-lex(peter,peter,nomen,sg).
+% ---------
+% Lexikon |
+% ---------
+
+% Namen der Familienangehoerigen
+lex(Name,Name,nomen,sg) :- maennlich(Name).
+lex(Name,Name,nomen,sg) :- weiblich(Name).
+
+% Worte, die Frageart festlegen
 lex(wer_ist,wer_ist,verb,sg).
 lex(ist,ist,verb,sg).
-lex(kind,ist_kind,pnomen,sg).
+
+% Praedikate
+lex(kind,ist_kind,praedikat,sg).
+lex(mutter,ist_mutter,praedikat,sg).
+lex(vater,ist_vater,praedikat,sg).
+lex(neffe,ist_neffe,praedikat,sg).
+lex(tante,ist_tante,praedikat,sg).
+lex(grosstante,ist_grosstante,praedikat,sg).
+lex(grossmutter,ist_grossmutter,praedikat,sg).
+lex(schwager,ist_schwager,praedikat,sg).
+lex(schwippschwager,ist_schwippschwager,praedikat,sg).
+
+% TODO Preadikate
+%-----------------
+% sind_verheiratet(X,Y) (Ehefrau/Ehemann)
+% sind_geschwister(X,Y) (Schwester/Bruder)
+% sind_halbgeschwister(HS,Ich) (Halbschwester/Halbbruder)
+
+
+% Artikel, Praepositionen, Sonstiges
 lex(ein,ein,artikel,_).
 lex(der,der,artikel,_).
 lex(die,die,artikel,_).
