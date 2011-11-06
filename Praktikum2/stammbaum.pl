@@ -112,6 +112,11 @@ sind_halbgeschwister(HS,Ich):-
   sind_eltern(X,Y,Ich),
   sind_eltern(X,Z,HS),
   Y \= Z.
+  
+sind_halbgeschwister(HS,Ich):-
+  sind_eltern(Y,X,Ich),
+  sind_eltern(Z,X,HS),
+  Y \= Z.
 
 %-----------------------------------------
 ist_schwager(Schwager,Ich):-

@@ -7,12 +7,13 @@
 start :-
       frage_lesen(Satz),
       frage_verarbeiten(Satz,Semantik),
-      %writeln('Struktur: '), writeln(Semantik), nl, % Nur zum Debuggen!!!
+      writeln('Struktur: '), writeln(Semantik), nl, % Nur zum Debuggen!!!
       stammbaum_fragen(Semantik).
 
 % ----------------------------------
 % Anfrage an den Stammbaum stellen |
 % ----------------------------------
+
 % Wenn ein Argument eine ungebundene Variable ist,
 % wird das Prädikat ausgeführt (call) und die dann gebundene
 % Variable ausgegeben (als Antwort auf eine Wer-ist-Frage)
@@ -34,7 +35,7 @@ frage_lesen(Satz) :- read_sentence(Satz).
 % erzeugt werden kann)
 frage_verarbeiten(Satz,Semantik) :- frage(Semantik,Satz,[?]).
 
-% Unterscheidung, ob Frage eine Ist-Frage, Wer-ist-Frage
+% Unterscheidung, ob Frage eine Ist-Frage, Wer-ist-Frage, Wer-sind-Frage
 % oder etwas anderes ist.
 frage(Semantik) --> ist_frage(Semantik).
 frage(Semantik) --> wer_ist_frage(Semantik).
@@ -53,11 +54,10 @@ wer_sind --> [wer,sind], {lex(wer_sind,_,verb,_)}.
 ist_frage([SemPraed,SemSubj,SemObj]) --> ist, subj(SemSubj,N), praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
 ist --> [ist], {lex(ist,_,verb,_)}.
 
-
-
 % -------------------------
 % Definition der Gramatik |
 % -------------------------
+
 subj(SemSubj,N) --> nomen(SemSubj,N).
 nomen(SemNomen,N) --> [X], {lex(X,SemNomen,nomen,N)}.
 
@@ -77,7 +77,7 @@ obj(SemObj,N) --> [X], {lex(X,SemObj,nomen,N)}.
 lex(Name,Name,nomen,sg) :- maennlich(Name).
 lex(Name,Name,nomen,sg) :- weiblich(Name).
 
-% Worte, die Frageart festlegen
+% Worte, die die Frageart festlegen
 lex(ist,ist,verb,sg).
 lex(wer_ist,wer_ist,verb,sg).
 lex(wer_sind,wer_sind,verb,sg).
