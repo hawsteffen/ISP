@@ -5,46 +5,93 @@
 :- ensure_loaded(stammbaum).
 
 start :-
-      frage_lesen(Struktur),
+      frage_lesen(Satz),
+      frage_verarbeiten(Satz,Semantik),
       write('Struktur: '), write(Struktur), nl, % Nur zum Debuggen!!!
-      stammbaum_fragen(Struktur).
+      stammbaum_fragen(Semantik).
 
+% ----------------------------------
+% Anfrage an den Stammbaum stellen |
+% ----------------------------------
+% Wenn ein Argument eine ungebundene Variable ist,
+% wird das Prädikat ausgeführt (call) und die dann gebundene
+% Variable ausgegeben (als Antwort auf eine Wer-ist-Frage)
 stammbaum_fragen([Funktor,Arg1,Arg2]) :- var(Arg1), Struktur =.. [Funktor,Arg1,Arg2], call(Struktur),!, writeln(Arg1).
-stammbaum_fragen([Funktor,Arg1,Arg2]) :- var(Arg2), Struktur =.. [Funktor,Arg1,Arg2], call(Struktur),!, writeln(Arg2).
-stammbaum_fragen(Semantik) :- Struktur =.. Semantik, call(Struktur),!, writeln('JA!').
+stammbaum_fragen([_,Arg1,_]) :- var(Arg1), writeln('Das weiß ich nicht...').
+
+% Wenn alle Variablen gebunden sind (ist-Frage), wird das Prädikat
+% ausgeführt und, wenn die Anfrage positiv beantwortet wurde, 'Ja' ausgegeben
+stammbaum_fragen(Semantik) :- Struktur =.. Semantik, call(Struktur),!, writeln('Ja!').
+
+% Sonst 'Nein' als Antwort ausgeben
 stammbaum_fragen(_) :- writeln('Nein!').
       
-frage_lesen(Semantik) :- read_sentence(Satz), s(Semantik,Satz,[?]).
+% Liest einen Satz vom Benutzer von der Eingabezeile.
+frage_lesen(Satz) :- read_sentence(Satz).
 
-s(Semantik) --> ist, ist_frage(Semantik).
+% Pruefen, ob die Frage korrekt formuliert wurde (mit der Gramatik
+% erzeugt werden kann)
+frage_verarbeiten(Satz,Semantik) :- frage(Semantik,Satz,[?]).
 
-s(Semantik) --> wer_ist, wer_ist_frage(Semantik).
+% Unterscheidung, ob Frage eine Ist-Frage, Wer-ist-Frage
+% oder etwas anderes ist.
+frage(Semantik) --> ist_frage(Semantik).
+frage(Semantik) --> wer_ist_frage(Semantik).
+frage(_) --> {writeln('Das weiß ich nicht...')}.
 
+% Verarbeitung der Wer-ist-Frage
+wer_ist_frage([SemPraed,_,SemObj]) --> wer_ist, praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
 wer_ist --> [wer,ist], {lex(wer_ist,_,verb,_)}.
 
-wer_ist_frage([SemPraed,_,SemObj]) --> praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
-
-
+% Verarbeitung der Ist-Frage
+ist_frage([SemPraed,SemSubj,SemObj]) --> ist, subj(SemSubj,N), praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
 ist --> [ist], {lex(ist,_,verb,_)}.
 
-ist_frage([SemPraed,SemSubj,SemObj]) --> subj(SemSubj,N), praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
-
+% -------------------------
+% Definition der Gramatik |
+% -------------------------
 subj(SemSubj,N) --> nomen(SemSubj,N).
 nomen(SemNomen,N) --> [X], {lex(X,SemNomen,nomen,N)}.
 
 praed_phrase(SemPraed,N) --> artikel(_,N), praed(SemPraed,N).
-praed(SemPraed,N) --> [X], {lex(X,SemPraed,pnomen,N)}. %'pnomen' ist Nomen, fuer die wir Preadikate definiert haben (kind/2, mutter/2,...)
+praed(SemPraed,N) --> [X], {lex(X,SemPraed,praedikat,N)}.
 artikel(_,N) --> [X], {lex(X,_,artikel,N)}.
 
 obj_phrase(SemObj,N) --> praeposition(_,N), obj(SemObj,N).
 praeposition(_,N) --> [X], {lex(X,_,praeposition,N)}.
 obj(SemObj,N) --> [X], {lex(X,SemObj,nomen,N)}.
 
-lex(hans,hans,nomen,sg).
-lex(peter,peter,nomen,sg).
+% ---------
+% Lexikon |
+% ---------
+
+% Namen der Familienangehoerigen
+lex(Name,Name,nomen,sg) :- maennlich(Name).
+lex(Name,Name,nomen,sg) :- weiblich(Name).
+
+% Worte, die Frageart festlegen
 lex(wer_ist,wer_ist,verb,sg).
 lex(ist,ist,verb,sg).
-lex(kind,ist_kind,pnomen,sg).
+
+% Praedikate
+lex(kind,ist_kind,praedikat,sg).
+lex(mutter,ist_mutter,praedikat,sg).
+lex(vater,ist_vater,praedikat,sg).
+lex(neffe,ist_neffe,praedikat,sg).
+lex(tante,ist_tante,praedikat,sg).
+lex(grosstante,ist_grosstante,praedikat,sg).
+lex(grossmutter,ist_grossmutter,praedikat,sg).
+lex(schwager,ist_schwager,praedikat,sg).
+lex(schwippschwager,ist_schwippschwager,praedikat,sg).
+lex(cousin,ist_cousin,praedikat,sg).
+lex(ehemann,sind_verheiratet,praedikat,sg).
+lex(ehefrau,sind_verheiratet,praedikat,sg).
+lex(bruder,sind_geschwister,praedikat,sg).
+lex(schwester,sind_geschwister,praedikat,sg).
+lex(halbschwester,sind_halbgeschwister,praedikat,sg).
+lex(halbbruder,sind_halbgeschwister,praedikat,sg).
+
+% Artikel, Praepositionen, Sonstiges
 lex(ein,ein,artikel,_).
 lex(der,der,artikel,_).
 lex(die,die,artikel,_).

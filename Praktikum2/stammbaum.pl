@@ -7,30 +7,50 @@ maennlich(hans).
 maennlich(peter).
 maennlich(werner).
 maennlich(klaus).
-maennlich(gert).
+maennlich(karl).
 maennlich(egon).
+maennlich(john).
+maennlich(willi).
+maennlich(herbert).
 
 weiblich(petra).
 weiblich(ilse).
 weiblich(lisa).
 weiblich(mona).
 weiblich(maggy).
+weiblich(petty).
+weiblich(heidi).
+weiblich(trude).
+weiblich(anke).
 
 ist_kind(hans,peter).
 ist_kind(hans,petra).
-ist_kind(mona,peter).
-ist_kind(mona,petra).
-ist_kind(ilse,werner).
+ist_kind(ilse,peter).
 ist_kind(ilse,petra).
-ist_kind(klaus,gert).
-ist_kind(klaus,maggy).
-ist_kind(egon,gert).
-ist_kind(egon,maggy).
-ist_kind(gert,peter).
-ist_kind(gert,petra).
+ist_kind(lisa,mona).
+ist_kind(lisa,peter).
+ist_kind(klaus,hans).
+ist_kind(egon,ilse).
+ist_kind(egon,werner).
+ist_kind(petra,maggy).
+ist_kind(petra,herbert).
+ist_kind(heidi,maggy).
+ist_kind(heidi,herbert).
+ist_kind(maggy,trude).
+ist_kind(maggy,john).
+ist_kind(petty,trude).
+ist_kind(petty,john).
+ist_kind(werner,anke).
+ist_kind(werner,willi).
+ist_kind(karl,anke).
+ist_kind(karl,willi).
 
-sind_verheiratet(mona,klaus).
-sind_verheiratet(klaus,mona).
+sind_verheiratet(peter,petra).
+sind_verheiratet(petra,peter).
+
+sind_verheiratet(ilse,werner).
+sind_verheiratet(werner,ilse).
+
 
 % ----------------------------------------
 sind_geschwister(X,Y):-

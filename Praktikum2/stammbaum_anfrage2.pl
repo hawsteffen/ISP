@@ -83,13 +83,13 @@ lex(grosstante,ist_grosstante,praedikat,sg).
 lex(grossmutter,ist_grossmutter,praedikat,sg).
 lex(schwager,ist_schwager,praedikat,sg).
 lex(schwippschwager,ist_schwippschwager,praedikat,sg).
-
-% TODO Preadikate
-%-----------------
-% sind_verheiratet(X,Y) (Ehefrau/Ehemann)
-% sind_geschwister(X,Y) (Schwester/Bruder)
-% sind_halbgeschwister(HS,Ich) (Halbschwester/Halbbruder)
-
+lex(cousin,ist_cousin,praedikat,sg).
+lex(ehemann,sind_verheiratet,praedikat,sg).
+lex(ehefrau,sind_verheiratet,praedikat,sg).
+lex(bruder,sind_geschwister,praedikat,sg).
+lex(schwester,sind_geschwister,praedikat,sg).
+lex(halbschwester,sind_halbgeschwister,praedikat,sg).
+lex(halbbruder,sind_halbgeschwister,praedikat,sg).
 
 % Artikel, Praepositionen, Sonstiges
 lex(ein,ein,artikel,_).
