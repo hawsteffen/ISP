@@ -7,7 +7,7 @@
 start :-
       frage_lesen(Satz),
       frage_verarbeiten(Satz,Semantik),
-      write('Struktur: '), write(Struktur), nl, % Nur zum Debuggen!!!
+      %writeln('Struktur: '), writeln(Semantik), nl, % Nur zum Debuggen!!!
       stammbaum_fragen(Semantik).
 
 % ----------------------------------
@@ -17,6 +17,7 @@ start :-
 % wird das Prädikat ausgeführt (call) und die dann gebundene
 % Variable ausgegeben (als Antwort auf eine Wer-ist-Frage)
 stammbaum_fragen([Funktor,Arg1,Arg2]) :- var(Arg1), Struktur =.. [Funktor,Arg1,Arg2], call(Struktur),!, writeln(Arg1).
+stammbaum_fragen([Funktor,Arg1,Arg2,Arg3]) :- var(Arg1), var(Arg2), Struktur =.. [Funktor,Arg1,Arg2,Arg3], call(Struktur),!, writeln(Arg1),writeln(Arg2).
 stammbaum_fragen([_,Arg1,_]) :- var(Arg1), writeln('Das weiß ich nicht...').
 
 % Wenn alle Variablen gebunden sind (ist-Frage), wird das Prädikat
@@ -37,15 +38,22 @@ frage_verarbeiten(Satz,Semantik) :- frage(Semantik,Satz,[?]).
 % oder etwas anderes ist.
 frage(Semantik) --> ist_frage(Semantik).
 frage(Semantik) --> wer_ist_frage(Semantik).
+frage(Semantik) --> wer_sind_frage(Semantik).
 frage(_) --> {writeln('Das weiß ich nicht...')}.
 
 % Verarbeitung der Wer-ist-Frage
 wer_ist_frage([SemPraed,_,SemObj]) --> wer_ist, praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
 wer_ist --> [wer,ist], {lex(wer_ist,_,verb,_)}.
 
+% Verarbeitung der Wer-sind-Frage
+wer_sind_frage([SemPraed,_,_,SemObj]) --> wer_sind, praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
+wer_sind --> [wer,sind], {lex(wer_sind,_,verb,_)}.
+
 % Verarbeitung der Ist-Frage
 ist_frage([SemPraed,SemSubj,SemObj]) --> ist, subj(SemSubj,N), praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
 ist --> [ist], {lex(ist,_,verb,_)}.
+
+
 
 % -------------------------
 % Definition der Gramatik |
@@ -54,8 +62,8 @@ subj(SemSubj,N) --> nomen(SemSubj,N).
 nomen(SemNomen,N) --> [X], {lex(X,SemNomen,nomen,N)}.
 
 praed_phrase(SemPraed,N) --> artikel(_,N), praed(SemPraed,N).
-praed(SemPraed,N) --> [X], {lex(X,SemPraed,praedikat,N)}.
 artikel(_,N) --> [X], {lex(X,_,artikel,N)}.
+praed(SemPraed,N) --> [X], {lex(X,SemPraed,praedikat,N)}.
 
 obj_phrase(SemObj,N) --> praeposition(_,N), obj(SemObj,N).
 praeposition(_,N) --> [X], {lex(X,_,praeposition,N)}.
@@ -70,8 +78,9 @@ lex(Name,Name,nomen,sg) :- maennlich(Name).
 lex(Name,Name,nomen,sg) :- weiblich(Name).
 
 % Worte, die Frageart festlegen
-lex(wer_ist,wer_ist,verb,sg).
 lex(ist,ist,verb,sg).
+lex(wer_ist,wer_ist,verb,sg).
+lex(wer_sind,wer_sind,verb,sg).
 
 % Praedikate
 lex(kind,ist_kind,praedikat,sg).
@@ -90,6 +99,7 @@ lex(bruder,sind_geschwister,praedikat,sg).
 lex(schwester,sind_geschwister,praedikat,sg).
 lex(halbschwester,sind_halbgeschwister,praedikat,sg).
 lex(halbbruder,sind_halbgeschwister,praedikat,sg).
+lex(eltern,sind_eltern,praedikat,sg).
 
 % Artikel, Praepositionen, Sonstiges
 lex(ein,ein,artikel,_).
