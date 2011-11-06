@@ -62,6 +62,8 @@ sind_geschwister(X,Y):-
 sind_eltern(M,V,Kind):-
   ist_mutter(M,Kind),
   ist_vater(V,Kind).
+  
+sind_eltern(M,V,Kind) :- sind_eltern(V,M,Kind).
 
 % ----------------------------------------
 ist_mutter(X,Y):-
