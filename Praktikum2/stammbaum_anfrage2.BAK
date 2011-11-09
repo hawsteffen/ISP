@@ -10,25 +10,7 @@ start :-
       %writeln('Struktur: '), writeln(Semantik), nl, % Nur zum Debuggen!!!
       stammbaum_fragen(Semantik).
 
-% ----------------------------------
-% Anfrage an den Stammbaum stellen |
-% ----------------------------------
 
-% Wenn ein Argument eine ungebundene Variable ist,
-% wird das Prädikat ausgeführt (call) und die dann gebundene
-% Variable ausgegeben (als Antwort auf eine Wer-ist-Frage)
-stammbaum_fragen([Funktor,Arg1,Arg2]) :- var(Arg1), Struktur =.. [Funktor,Arg1,Arg2], call(Struktur),!, writeln(Arg1).
-stammbaum_fragen([Funktor,Arg1,Arg2,Arg3]) :- Struktur =.. [Funktor,Arg1,Arg2,Arg3], call(Struktur),!, writeln('Ja').
-stammbaum_fragen([Funktor,Arg1,Arg2,Arg3]) :- Struktur =.. [Funktor,Arg1,Arg2,Arg3], call(Struktur),!, writeln('Ja').
-stammbaum_fragen([_,Arg1,_]) :- var(Arg1), writeln('Das weiß ich nicht...').
-
-% Wenn alle Variablen gebunden sind (ist-Frage), wird das Prädikat
-% ausgeführt und, wenn die Anfrage positiv beantwortet wurde, 'Ja' ausgegeben
-stammbaum_fragen(Semantik) :- Struktur =.. Semantik, call(Struktur),!, writeln('Ja!').
-
-% Sonst 'Nein' als Antwort ausgeben
-stammbaum_fragen(_) :- writeln('Nein!').
-      
 % Liest einen Satz vom Benutzer von der Eingabezeile.
 frage_lesen(Satz) :- read_sentence(Satz).
 
@@ -36,41 +18,68 @@ frage_lesen(Satz) :- read_sentence(Satz).
 % erzeugt werden kann)
 frage_verarbeiten(Satz,Semantik) :- frage(Semantik,Satz,[?]).
 
+% ----------------------------------
+% Anfrage an den Stammbaum stellen |
+% ----------------------------------
+% Wenn ein Argument eine ungebundene Variable ist,
+% wird das Prädikat ausgeführt (call) und die dann gebundene
+% Variable ausgegeben (als Antwort auf eine Wer-ist-Frage)
+stammbaum_fragen([Funktor,Arg1,Arg2]) :-
+                                      var(Arg1),
+                                      Struktur =.. [Funktor,Arg1,Arg2],
+                                      call(Struktur),
+                                      writeln(Arg1).
+stammbaum_fragen([_,Arg1,_]) :-
+                             var(Arg1),
+                             writeln('Das weiß ich nicht...').
+                                      
+stammbaum_fragen([Funktor,Arg1,Arg2,Arg3]) :-
+                                           Struktur =.. [Funktor,Arg1,Arg2,Arg3],
+                                           call(Struktur),!,
+                                           writeln('Ja').
+
+% Wenn alle Variablen gebunden sind (ist-Frage), wird das Prädikat
+% ausgeführt und, wenn die Anfrage positiv beantwortet wurde, 'Ja' ausgegeben
+stammbaum_fragen(Semantik) :- Struktur =.. Semantik, call(Struktur),!, writeln('Ja!').
+                                           
+% Sonst 'Nein' als Antwort ausgeben
+stammbaum_fragen(_) :- writeln('Nein!').
+
 % Unterscheidung, ob Frage eine Ist-Frage, Wer-ist-Frage, Wer-sind-Frage
 % oder etwas anderes ist.
 frage(Semantik) --> ist_frage(Semantik).
 frage(Semantik) --> wer_ist_frage(Semantik).
-frage(Semantik) --> wer_sind_frage(Semantik).
 frage(Semantik) --> sind_frage(Semantik).
+frage(Semantik) --> wer_sind_frage(Semantik).
 frage(_) --> {writeln('Das weiß ich nicht...')}.
-
-% Verarbeitung der Wer-ist-Frage
-wer_ist_frage([SemPraed,_,SemObj]) --> wer_ist, praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
-wer_ist --> [wer,ist], {lex(wer_ist,_,verb,_)}.
-
-% Verarbeitung der Wer-sind-irgendwas-von-wem-Frage
-wer_sind_frage([SemPraed,_,_,SemObj]) --> wer_sind, praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
-wer_sind --> [wer,sind], {lex(wer_sind,_,verb,_)}.
 
 % Verarbeitung der Ist-Frage
 ist_frage([SemPraed,SemSubj,SemObj]) --> ist, subj(SemSubj,N), praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
-ist --> [ist], {lex(ist,_,verb,_)}.
 
-% Verarbeitung der Sind-X-undY-irgendwas-Frage
-sind_frage([SemPraed,SemSubj1,SemSubj2]) --> sind, subj(SemSubj1,N), und, subj(SemSubj2,N), praed_phrase_ohne_artikel(SemPraed,_).
-sind_frage([SemPraed,SemSubj1,SemSubj2,SemObj]) --> sind, subj(SemSubj1,N), und, subj(SemSubj2,N), praed_phrase_ohne_artikel(SemPraed,_), obj_phrase(SemObj,N).
-sind --> [sind], {lex(sind,_,verb,_)}.
-und --> [und], {lex(und,_,bindewort,_)}.
+% Verarbeitung der Wer-ist-Frage
+wer_ist_frage([SemPraed,_,SemObj]) --> wer_ist, praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
+
+% Verarbeitung der Sind-X-und-Y-irgendwas-Frage
+sind_frage([SemPraed,SemSubj1,SemSubj2]) --> sind, subj(SemSubj1,N), und, subj(SemSubj2,N), praed_phrase(SemPraed,_).
+sind_frage([SemPraed,SemSubj1,SemSubj2,SemObj]) --> sind, subj(SemSubj1,N), und, subj(SemSubj2,N), praed_phrase(SemPraed,_), obj_phrase(SemObj,N).
+
+% Verarbeitung der Wer-sind-irgendwas-von-wem-Frage
+wer_sind_frage([SemPraed,_,_,SemObj]) --> wer_sind, praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
 
 % -------------------------
 % Definition der Gramatik |
 % -------------------------
+und --> [und], {lex(und,_,bindewort,_)}.
+ist --> [ist], {lex(ist,_,verb,_)}.
+wer_ist --> [wer,ist], {lex(wer_ist,_,verb,_)}.
+sind --> [sind], {lex(sind,_,verb,_)}.
+wer_sind --> [wer,sind], {lex(wer_sind,_,verb,_)}.
 
 subj(SemSubj,N) --> nomen(SemSubj,N).
 nomen(SemNomen,N) --> [X], {lex(X,SemNomen,nomen,N)}.
 
 praed_phrase(SemPraed,N) --> artikel(_,N), praed(SemPraed,N).
-praed_phrase_ohne_artikel(SemPraed,N) --> praed(SemPraed,N).
+praed_phrase(SemPraed,N) --> praed(SemPraed,N).
 artikel(_,N) --> [X], {lex(X,_,artikel,N)}.
 praed(SemPraed,N) --> [X], {lex(X,SemPraed,praedikat,N)}.
 
@@ -106,13 +115,13 @@ lex(schwippschwager,ist_schwippschwager,praedikat,sg).
 lex(cousin,ist_cousin,praedikat,sg).
 lex(ehemann,sind_verheiratet,praedikat,sg).
 lex(ehefrau,sind_verheiratet,praedikat,sg).
+lex(verheiratet,sind_verheiratet,praedikat,sg).
 lex(bruder,sind_geschwister,praedikat,sg).
 lex(schwester,sind_geschwister,praedikat,sg).
 lex(geschwister,sind_geschwister,praedikat,sg).
 lex(halbschwester,sind_halbgeschwister,praedikat,sg).
 lex(halbbruder,sind_halbgeschwister,praedikat,sg).
 lex(halbgeschwister,sind_halbgeschwister,praedikat,sg).
-lex(eltern,sind_eltern,praedikat,sg).
 
 % Artikel, Praepositionen, Sonstiges
 lex(ein,ein,artikel,_).
