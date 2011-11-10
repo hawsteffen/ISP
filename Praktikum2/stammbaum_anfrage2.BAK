@@ -21,88 +21,67 @@ frage_verarbeiten(Satz,Semantik) :- frage(Semantik,Satz,[?]).
 % ----------------------------------
 % Anfrage an den Stammbaum stellen |
 % ----------------------------------
-% Wenn ein Argument eine ungebundene Variable ist,
-% wird das Prädikat ausgeführt (call) und die dann gebundene
-% Variable ausgegeben (als Antwort auf eine Wer-ist-Frage)
-stammbaum_fragen([Funktor,Arg1,Arg2]) :-
-                                      var(Arg1),
-                                      Struktur =.. [Funktor,Arg1,Arg2],
-                                      call(Struktur),
-                                      writeln(Arg1).
-stammbaum_fragen([_,Arg1,_]) :-
-                             var(Arg1),
-                             writeln('Das weiß ich nicht...').
-                                      
-stammbaum_fragen([Funktor,Arg1,Arg2,Arg3]) :-
-                                           Struktur =.. [Funktor,Arg1,Arg2,Arg3],
-                                           call(Struktur),!,
-                                           writeln('Ja').
+% Offene Frage.
+stammbaum_fragen([Funktor, Arg1, Arg2]) :-
+                           var(Arg1),
+                           Struktur =.. [Funktor, Arg1, Arg2],
+                           writeln(Struktur),
+                           findall(Arg1,Struktur,Ergebnis),
+                           antwort(Ergebnis).
 
-% Wenn alle Variablen gebunden sind (ist-Frage), wird das Prädikat
-% ausgeführt und, wenn die Anfrage positiv beantwortet wurde, 'Ja' ausgegeben
+% Wenn alle Variablen gebunden sind (geschlossene Frage), wird das Prädikat
+% ausgeführt. Wenn die Anfrage positiv beantwortet wurde, 'Ja' ausgegeben
 stammbaum_fragen(Semantik) :- Struktur =.. Semantik, call(Struktur),!, writeln('Ja!').
                                            
 % Sonst 'Nein' als Antwort ausgeben
 stammbaum_fragen(_) :- writeln('Nein!').
 
-% Unterscheidung, ob Frage eine Ist-Frage, Wer-ist-Frage, Wer-sind-Frage
+% Antwort ausgeben
+antwort([]) :- writeln('Keine Ahnung...').
+antwort([K|[]]) :- write(K).
+antwort([K,R]) :- write(K), write(' und '), antwort(R).
+
+% Unterscheidung, ob Frage eine offene, geschlossene,
 % oder etwas anderes ist.
-frage(Semantik) --> ist_frage(Semantik).
-frage(Semantik) --> wer_ist_frage(Semantik).
-frage(Semantik) --> sind_frage(Semantik).
-frage(Semantik) --> wer_sind_frage(Semantik).
+frage(Semantik) --> geschlossene_frage(Semantik).
+frage(Semantik) --> offene_frage(Semantik).
 frage(_) --> {writeln('Das weiß ich nicht...')}.
 
-% Verarbeitung der Ist-Frage
-ist_frage([SemPraed,SemSubj,SemObj]) --> ist, subj(SemSubj,N), praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
+% Verarbeitung der verschiedenen Frage
+geschlossene_frage([SemNP1,SemNomen,SemNP2]) --> verb(_,N), nomen(SemNomen,N), nominal_phrase(SemNP1,N), nominal_phrase(SemNP2,N).
+offene_frage([SemNP1,_,SemNP2]) --> frage_wort(_,_), verb(_,N), nominal_phrase(SemNP1,N), nominal_phrase(SemNP2,N).
 
-% Verarbeitung der Wer-ist-Frage
-wer_ist_frage([SemPraed,_,SemObj]) --> wer_ist, praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
+nominal_phrase(SemNom,N) --> artikel(_,_), nomen(SemNom,N).
+nominal_phrase(SemNom,N) --> praeposition(_,_), nomen(SemNom,N).
 
-% Verarbeitung der Sind-X-und-Y-irgendwas-Frage
-sind_frage([SemPraed,SemSubj1,SemSubj2]) --> sind, subj(SemSubj1,N), und, subj(SemSubj2,N), praed_phrase(SemPraed,_).
-sind_frage([SemPraed,SemSubj1,SemSubj2,SemObj]) --> sind, subj(SemSubj1,N), und, subj(SemSubj2,N), praed_phrase(SemPraed,_), obj_phrase(SemObj,N).
-
-% Verarbeitung der Wer-sind-irgendwas-von-wem-Frage
-wer_sind_frage([SemPraed,_,_,SemObj]) --> wer_sind, praed_phrase(SemPraed,N), obj_phrase(SemObj,N).
+verb(_,N) --> [X], {lex(X,_Sem,verb,N)}.
+frage_wort(_,_) --> [X], {lex(X,_Sem,frage_wort,_N)}.
 
 % -------------------------
 % Definition der Gramatik |
 % -------------------------
-und --> [und], {lex(und,_,bindewort,_)}.
-ist --> [ist], {lex(ist,_,verb,_)}.
-wer_ist --> [wer,ist], {lex(wer_ist,_,verb,_)}.
-sind --> [sind], {lex(sind,_,verb,_)}.
-wer_sind --> [wer,sind], {lex(wer_sind,_,verb,_)}.
-
-subj(SemSubj,N) --> nomen(SemSubj,N).
 nomen(SemNomen,N) --> [X], {lex(X,SemNomen,nomen,N)}.
-
-praed_phrase(SemPraed,N) --> artikel(_,N), praed(SemPraed,N).
-praed_phrase(SemPraed,N) --> praed(SemPraed,N).
-artikel(_,N) --> [X], {lex(X,_,artikel,N)}.
-praed(SemPraed,N) --> [X], {lex(X,SemPraed,praedikat,N)}.
-
-obj_phrase(SemObj,N) --> praeposition(_,N), obj(SemObj,N).
+artikel(_,N) --> [X], {lex(X,_Sem,artikel,N)}.
 praeposition(_,N) --> [X], {lex(X,_,praeposition,N)}.
-obj(SemObj,N) --> [X], {lex(X,SemObj,nomen,N)}.
 
 % ---------
 % Lexikon |
 % ---------
 
+lex(wer,wer,frage_wort,sg).
+lex(ist,ist,verb,sg).
+lex(sind,sind,verb,pl).
+
 % Namen der Familienangehoerigen
 lex(Name,Name,nomen,sg) :- maennlich(Name).
 lex(Name,Name,nomen,sg) :- weiblich(Name).
 
-% Worte, die die Frageart festlegen
-lex(ist,ist,verb,sg).
-lex(wer_ist,wer_ist,verb,sg).
-lex(wer_sind,wer_sind,verb,sg).
-lex(sind,sind,verb,sg).
-
 % Praedikate
-lex(kind,ist_kind,praedikat,sg).
+lex(kind,ist_kind,nomen,sg).
+lex(kinder,sind_kinder,nomen,pl).
+
+
+
 lex(mutter,ist_mutter,praedikat,sg).
 lex(vater,ist_vater,praedikat,sg).
 lex(eltern,sind_eltern,praedikat,sg).
