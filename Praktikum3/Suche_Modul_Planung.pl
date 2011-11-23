@@ -62,11 +62,14 @@ state_member(State,[FirstState|_]):-
 state_member(State,[_|RestStates]):-  
   state_member(State,RestStates).
 
-eval_path([(_,_,0)|_]).
-%eval_path([(_,State,Value)|RestPath]):-
-%  eval_state(State,"Rest des Literals bzw. der Klausel"
-%  "Value berechnen".
+%eval_path([(_,_,0)|_]).
+eval_path([(_,State,Value)|_]):-
+  eval_state(State,Value).
 
+eval_state(State,Value) :-
+  goal_description(Ziel),
+  schnittmenge(State,Ziel,Schnitt),
+  length(Schnitt,Value).
   
 
 action(pick_up(X),
@@ -151,3 +154,12 @@ ist_teilmenge([], _).
 ist_teilmenge([Element|Rest], Menge) :-
         member(Element, Menge),
         ist_teilmenge(Rest, Menge).
+        
+% schnittmenge(Menge_A, Menge_B, Menge_C)
+schnittmenge([], _, []).
+schnittmenge([Element|Tail], Liste, Schnitt) :-
+        member(Element, Liste), !,
+        Schnitt = [Element|Rest],
+        schnittmenge(Tail, Liste, Rest).
+schnittmenge([_|Tail], Liste, Rest) :-
+        schnittmenge(Tail, Liste, Rest).

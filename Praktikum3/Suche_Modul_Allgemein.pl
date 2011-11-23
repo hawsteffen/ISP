@@ -14,8 +14,8 @@ solve(Strategy):-
 solve(StartNode,Strategy) :-
   start_node(StartNode),
   search([[StartNode]],Strategy,Path),
-  reverse(Path,Path_in_correct_order),
-  write_solution(Path_in_correct_order).
+  reverse(Path,Path_in_correct_order).
+%  write_solution(Path_in_correct_order).
 
 
 
@@ -34,7 +34,8 @@ write_actions([(Action,_,_)|Rest]):-
 %
 search([[FirstNode|Predecessors]|_],_,[FirstNode|Predecessors]) :- 
   goal_node(FirstNode),
-  nl,write('SUCCESS'),nl,!.
+%  nl,write('SUCCESS'),nl,
+!.
 
 
 search([[FirstNode|Predecessors]|RestPaths],Strategy,Solution) :- 
@@ -94,7 +95,8 @@ write_fail(_,_):-  nl,write('FAIL').
 
 % Alle Strategien: Keine neuen Pfade vorhanden
 insert_new_paths(Strategy,[],OldPaths,OldPaths):-
-  write_fail(Strategy,OldPaths),!.
+%  write_fail(Strategy,OldPaths),
+!.
 
 % Tiefensuche
 insert_new_paths(depth,NewPaths,OldPaths,AllPaths):-
@@ -110,6 +112,6 @@ insert_new_paths(breadth,NewPaths,OldPaths,AllPaths):-
 % Informierte Suche
 insert_new_paths(informed,NewPaths,OldPaths,AllPaths):-
   eval_paths(NewPaths),
-  insert_new_paths_informed(NewPaths,OldPaths,AllPaths),
-  write_action(AllPaths),
-  write_state(AllPaths).
+  insert_new_paths_informed(NewPaths,OldPaths,AllPaths).
+  %write_action(AllPaths),
+  %write_state(AllPaths).
