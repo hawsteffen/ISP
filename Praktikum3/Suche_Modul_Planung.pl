@@ -62,26 +62,27 @@ state_member(State,[FirstState|_]):-
 state_member(State,[_|RestStates]):-  
   state_member(State,RestStates).
 
-eval_path([(_,State,Value)|_]):-
-  eval_state(schnittmenge,State,Value).
+eval_path(Path):-
+  length(Path,G),
+  eval_state(schnittmenge,Path,G).
 
 % Bewertungsheuristiken
 %-----------------------
 
 % Gibt jedem Knoten den Wert 0
-eval_state(zero,_,0).
+eval_state(zero,[(_,_,0)|_],_).
 
 % Der Wert jedes Knotens ist die Differenz der Anzahl der Elemente der Schnittmenge
-% von State und dem Zielzustand und der Elemente des Zielzustands.
-% Formel: Value(State) = |Ziel| - |State n Ziel|
-% Z.B. |State n Ziel| = 3 und |Ziel| = 10, dann ist der Wert von State 10 - 3 = 7
-eval_state(schnittmenge,State,Value) :-
+% von State und dem Zielzustand und der Elemente des Zielzustands + der bisherigen
+% Länge des Pfades. Das verhindert die negativen Auswirkungen des Unterschätzens von Pfaden.
+% Formel: Value(State) = |Ziel| - |State n Ziel| + lenght(Pfad)
+% Z.B. |State n Ziel| = 3, |Ziel| = 10 und length(Pfad) = 2, dann ist der Wert von State 10 - 3 + 2 = 9
+eval_state(schnittmenge,[(_,State,Value)|_],G) :-
   goal_description(Ziel),
   schnittmenge(State,Ziel,Schnitt),
   length(Schnitt,AnzSchnitt),
   length(Ziel,AnzZiel),
-  Value is AnzZiel - AnzSchnitt.
-  
+  Value is (AnzZiel - AnzSchnitt) + G.  
 
 action(pick_up(X),
        [handempty, clear(X), on(table,X)],
