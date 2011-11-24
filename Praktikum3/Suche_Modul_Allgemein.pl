@@ -13,9 +13,9 @@ solve(Strategy):-
 %
 solve(StartNode,Strategy) :-
   start_node(StartNode),
-  search([[StartNode]],Strategy,_Path).
-%  reverse(Path,Path_in_correct_order),
-%  write_solution(Path_in_correct_order).
+  search([[StartNode]],Strategy,Path),
+  reverse(Path,Path_in_correct_order),
+  write_solution(Path_in_correct_order).
 
 
 
@@ -34,8 +34,7 @@ write_actions([(Action,_,_)|Rest]):-
 %
 search([[FirstNode|Predecessors]|_],_,[FirstNode|Predecessors]) :- 
   goal_node(FirstNode),
-%  nl,write('SUCCESS'),nl,
-!.
+  nl,write('SUCCESS'),nl,!.
 
 
 search([[FirstNode|Predecessors]|RestPaths],Strategy,Solution) :- 

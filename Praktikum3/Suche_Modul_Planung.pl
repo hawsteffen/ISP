@@ -71,13 +71,16 @@ eval_path([(_,State,Value)|_]):-
 % Gibt jedem Knoten den Wert 0
 eval_state(zero,_,0).
 
-% Der Wert jedes Knotens ist die Anzahl der Elemente der Schnittmenge
-% von State und dem Zielzustand mit negativem Vorzeichen.
+% Der Wert jedes Knotens ist die Differenz der Anzahl der Elemente der Schnittmenge
+% von State und dem Zielzustand und der Elemente des Zielzustands.
+% Formel: Value(State) = |Ziel| - |State n Ziel|
+% Z.B. |State n Ziel| = 3 und |Ziel| = 10, dann ist der Wert von State 10 - 3 = 7
 eval_state(schnittmenge,State,Value) :-
   goal_description(Ziel),
   schnittmenge(State,Ziel,Schnitt),
   length(Schnitt,AnzSchnitt),
-  Value is 0 - AnzSchnitt.
+  length(Ziel,AnzZiel),
+  Value is AnzZiel - AnzSchnitt.
   
 
 action(pick_up(X),
