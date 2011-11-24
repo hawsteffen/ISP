@@ -13,8 +13,8 @@ solve(Strategy):-
 %
 solve(StartNode,Strategy) :-
   start_node(StartNode),
-  search([[StartNode]],Strategy,Path),
-  reverse(Path,Path_in_correct_order).
+  search([[StartNode]],Strategy,_Path).
+%  reverse(Path,Path_in_correct_order),
 %  write_solution(Path_in_correct_order).
 
 
@@ -94,20 +94,20 @@ write_fail(depth,[[(_,State)|_]|_]):-
 write_fail(_,_):-  nl,write('FAIL').
 
 % Alle Strategien: Keine neuen Pfade vorhanden
-insert_new_paths(Strategy,[],OldPaths,OldPaths):-
+insert_new_paths(_Strategy,[],OldPaths,OldPaths):-
 %  write_fail(Strategy,OldPaths),
 !.
 
 % Tiefensuche
 insert_new_paths(depth,NewPaths,OldPaths,AllPaths):-
-  append(NewPaths,OldPaths,AllPaths),
-  write_action(NewPaths).
+  append(NewPaths,OldPaths,AllPaths).
+%  write_action(NewPaths).
 
 % Breitensuche
 insert_new_paths(breadth,NewPaths,OldPaths,AllPaths):-
-  append(OldPaths,NewPaths,AllPaths),
-  write_next_state(AllPaths),
-  write_action(AllPaths).
+  append(OldPaths,NewPaths,AllPaths).
+%  write_next_state(AllPaths),
+%  write_action(AllPaths).
 
 % Informierte Suche
 insert_new_paths(informed,NewPaths,OldPaths,AllPaths):-

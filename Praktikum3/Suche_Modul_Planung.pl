@@ -62,14 +62,22 @@ state_member(State,[FirstState|_]):-
 state_member(State,[_|RestStates]):-  
   state_member(State,RestStates).
 
-%eval_path([(_,_,0)|_]).
 eval_path([(_,State,Value)|_]):-
-  eval_state(State,Value).
+  eval_state(schnittmenge,State,Value).
 
-eval_state(State,Value) :-
+% Bewertungsheuristiken
+%-----------------------
+
+% Gibt jedem Knoten den Wert 0
+eval_state(zero,_,0).
+
+% Der Wert jedes Knotens ist die Anzahl der Elemente der Schnittmenge
+% von State und dem Zielzustand mit negativem Vorzeichen.
+eval_state(schnittmenge,State,Value) :-
   goal_description(Ziel),
   schnittmenge(State,Ziel,Schnitt),
-  length(Schnitt,Value).
+  length(Schnitt,AnzSchnitt),
+  Value is 0 - AnzSchnitt.
   
 
 action(pick_up(X),
