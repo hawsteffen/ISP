@@ -71,9 +71,9 @@ mysubset([H|T],List):-
   mysubset(T,List).
 
 %--------------------------------
-eval_path(Path):-
+eval_path(Suchverfahren,Path):-
   length(Path,G),
-  eval_state(a,Path,G).
+  eval_state(Suchverfahren,Path,G).
 
 % Implementierung der Suchverfahren
 %-----------------------------------
@@ -87,7 +87,7 @@ eval_state(a,[(_,State,Value)|_],G) :-
   
 % Gierige Bestensuche
 eval_state(greedy,[(_,State,Heuristik)|_],_) :-
-  heuristik(right_pos,State,Heuristik).
+  heuristik(wrong_pos,State,Heuristik).
 
 % Bewertungsheuristiken
 %-----------------------
