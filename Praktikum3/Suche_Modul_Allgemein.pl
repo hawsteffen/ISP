@@ -79,7 +79,7 @@ get_state((_,State,_),State).
 %%% Strategie:
 
 write_action([[(Action,_)|_]|_]):-
-  nl,write('Action: '),write(Action),nl.
+  nl,write('Action___: '),write(Action),nl.
 
 write_next_state([[_,(_,State)|_]|_]):-
   nl,write('Go on with: '),write(State),nl.

@@ -7,8 +7,6 @@ eval_paths([FirstPath|RestPaths]):-
   eval_path(FirstPath),
   eval_paths(RestPaths).
 
-
-
 insert_new_paths_informed([],OldPaths,OldPaths).
 
 insert_new_paths_informed([FirstNewPath|RestNewPaths],OldPaths,AllPaths):-

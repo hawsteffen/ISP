@@ -12,14 +12,14 @@ start_description([
   block(block1),
   block(block2),
   block(block3),
-  block(block4),  %mit Block4
+  %block(block4),  %mit Block4
   on(table,block2),
   on(table,block3),
   on(block2,block1),
-  on(table,block4), %mit Block4
+  %on(table,block4), %mit Block4
   clear(block1),
   clear(block3),
-  clear(block4), %mit Block4
+  %clear(block4), %mit Block4
   handempty
   ]).
 
@@ -27,12 +27,12 @@ goal_description([
   block(block1),
   block(block2),
   block(block3),
-  block(block4), %mit Block4
-  on(block4,block2), %mit Block4
+  %block(block4), %mit Block4
+  %on(block4,block2), %mit Block4
   on(table,block3),
   on(table,block1),
-  on(block1,block4), %mit Block4
-  %on(block1,block2), %ohne Block4
+  %on(block1,block4), %mit Block4
+  on(block1,block2), %ohne Block4
   clear(block3),
   clear(block2),
   handempty
@@ -64,25 +64,29 @@ state_member(State,[_|RestStates]):-
 
 eval_path(Path):-
   length(Path,G),
-  eval_state(schnittmenge,Path,G).
+  eval_state(a,Path,G).
 
 % Bewertungsheuristiken
 %-----------------------
-
-% Gibt jedem Knoten den Wert 0
-eval_state(zero,[(_,_,0)|_],_).
 
 % Der Wert jedes Knotens ist die Differenz der Anzahl der Elemente der Schnittmenge
 % von State und dem Zielzustand und der Elemente des Zielzustands + der bisherigen
 % Länge des Pfades. Das verhindert die negativen Auswirkungen des Unterschätzens von Pfaden.
 % Formel: Value(State) = |Ziel| - |State n Ziel| + lenght(Pfad)
 % Z.B. |State n Ziel| = 3, |Ziel| = 10 und length(Pfad) = 2, dann ist der Wert von State 10 - 3 + 2 = 9
-eval_state(schnittmenge,[(_,State,Value)|_],G) :-
+eval_state(a,[(_,State,Value)|_],G) :-
+  heuristik(schnittmenge,State,Heuristik),
+  Value is Heuristik + G.
+
+heuristik(schnittmenge,State,Value) :-
   goal_description(Ziel),
   schnittmenge(State,Ziel,Schnitt),
   length(Schnitt,AnzSchnitt),
   length(Ziel,AnzZiel),
-  Value is (AnzZiel - AnzSchnitt) + G.  
+  Value is (AnzZiel - AnzSchnitt).
+
+heuristik(zero,[(_,_,0)|_],_).
+
 
 action(pick_up(X),
        [handempty, clear(X), on(table,X)],
