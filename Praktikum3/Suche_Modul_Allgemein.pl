@@ -107,9 +107,16 @@ insert_new_paths(breadth,NewPaths,OldPaths,AllPaths):-
   write_next_state(AllPaths),
   write_action(AllPaths).
 
-% Informierte Suche
+% Informierte Suche: A, Gierige Bestensuche
 insert_new_paths(informed,NewPaths,OldPaths,AllPaths):-
   eval_paths(NewPaths),
   insert_new_paths_informed(NewPaths,OldPaths,AllPaths),
   write_action(AllPaths),
   write_state(AllPaths).
+
+% Optimistisches Bergsteigen
+insert_new_paths(hill_climbing,NewPaths,OldPaths,[BestPath]):-
+  eval_paths(NewPaths),
+  insert_new_paths_informed(NewPaths,OldPaths,[BestPath|_]),
+  write_action([BestPath]),
+  write_state([BestPath]).

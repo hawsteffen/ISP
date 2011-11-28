@@ -12,14 +12,14 @@ start_description([
   block(block1),
   block(block2),
   block(block3),
-  %block(block4),  %mit Block4
+  block(block4),  %mit Block4
   on(table,block2),
   on(table,block3),
   on(block2,block1),
-  %on(table,block4), %mit Block4
+  on(table,block4), %mit Block4
   clear(block1),
   clear(block3),
-  %clear(block4), %mit Block4
+  clear(block4), %mit Block4
   handempty
   ]).
 
@@ -27,67 +27,90 @@ goal_description([
   block(block1),
   block(block2),
   block(block3),
-  %block(block4), %mit Block4
-  %on(block4,block2), %mit Block4
+  block(block4), %mit Block4
+  on(block4,block2), %mit Block4
   on(table,block3),
   on(table,block1),
-  %on(block1,block4), %mit Block4
-  on(block1,block2), %ohne Block4
+  on(block1,block4), %mit Block4
+  %on(block1,block2), %ohne Block4
   clear(block3),
   clear(block2),
   handempty
   ]).
 
 
-
+% Definition des Startknotens
 start_node((start,_,_)).
 
+% Definition des Zielknotens
 goal_node((_,State,_)):-
   goal_description(Goal),
   state_member(State,[Goal]).
 
 
 
-% Aufgrund der Komplexität der Zustandsbeschreibungen kann state_member nicht auf 
-% das Standardprädikat member zurückgeführt werden.
-%  
+% State-member
+% Prueft, ob ein Zustand Teil eines anderen Zustands ist
+% z.B.: "Ist der aktuelle Zustand Teil des Zielzustands?"
 state_member(_,[]):- !,fail.
 
 state_member(State,[FirstState|_]):-
-  length(State,L),
-  length(FirstState,L),
-  differenzmenge(State,FirstState,[]),!.
-
+  mysubset(State,FirstState).
+  
 %Es ist sichergestellt, dass die beiden ersten Klauseln nicht zutreffen.
 state_member(State,[_|RestStates]):-  
   state_member(State,RestStates).
 
+% Hilfskonstrukt, weil das PROLOG "subset" nicht die Unifikation von Listenelementen
+% durchführt, wenn Variablen enthalten sind. "member" unifiziert hingegen.
+%
+mysubset([],_).
+
+mysubset([H|T],List):-
+  member(H,List),
+  mysubset(T,List).
+
+%--------------------------------
 eval_path(Path):-
   length(Path,G),
   eval_state(a,Path,G).
 
+% Implementierung der Suchverfahren
+%-----------------------------------
+% Die Suchverfahren unterscheiden sich eigentlich nur
+% darin, wie der Value (f(n)) berechnet wird
+
+% A: weil unsere Heuristik überschätzen kann
+eval_state(a,[(_,State,Value)|_],G) :-
+  heuristik(wrong_pos,State,Heuristik),
+  Value is Heuristik + G.
+  
+% Gierige Bestensuche
+eval_state(greedy,[(_,State,Heuristik)|_],_) :-
+  heuristik(right_pos,State,Heuristik).
+
 % Bewertungsheuristiken
 %-----------------------
 
-% Der Wert jedes Knotens ist die Differenz der Anzahl der Elemente der Schnittmenge
-% von State und dem Zielzustand und der Elemente des Zielzustands + der bisherigen
-% Länge des Pfades. Das verhindert die negativen Auswirkungen des Unterschätzens von Pfaden.
-% Formel: Value(State) = |Ziel| - |State n Ziel| + lenght(Pfad)
-% Z.B. |State n Ziel| = 3, |Ziel| = 10 und length(Pfad) = 2, dann ist der Wert von State 10 - 3 + 2 = 9
-eval_state(a,[(_,State,Value)|_],G) :-
-  heuristik(schnittmenge,State,Heuristik),
-  Value is Heuristik + G.
-
-heuristik(schnittmenge,State,Value) :-
+% Anzahl der Elemente, die schon an der richtigen Position sind
+heuristik(right_pos,State,Value) :-
   goal_description(Ziel),
   schnittmenge(State,Ziel,Schnitt),
   length(Schnitt,AnzSchnitt),
   length(Ziel,AnzZiel),
   Value is (AnzZiel - AnzSchnitt).
+  
+% Anzahl der Elemente, die noch an der falschen Position sind
+heuristik(wrong_pos,State,Value) :-
+  goal_description(Ziel),
+  differenzmenge(State,Ziel,Differenz),
+  length(Differenz,Value).
 
-heuristik(zero,[(_,_,0)|_],_).
+% Entfernung zum Ziel immer 0 (=Uniformierte Breitensuche)
+heuristik(zero,_,0).
 
-
+% Aktionen
+%----------
 action(pick_up(X),
        [handempty, clear(X), on(table,X)],
        [handempty, clear(X), on(table,X)],
@@ -109,15 +132,10 @@ action(put_on(Y,X),
        [handempty, clear(X), on(Y,X)]).
 
 
-% Hilfskonstrukt, weil das PROLOG "subset" nicht die Unifikation von Listenelementen 
-% durchführt, wenn Variablen enthalten sind. "member" unifiziert hingegen.
-%
-mysubset([],_).
-mysubset([H|T],List):-
-  member(H,List),
-  mysubset(T,List).
 
-
+% Prueft, welche Aktionen vom momentanen Zustand aus möglich sind
+% TODO: Vielleicht zusammenfassen...?
+%-----------------------------------------------------------------
 expand_help(State,Name,NewState):-
   member(block(Block), State),
   Name = pick_up(Block),
@@ -146,9 +164,8 @@ expand_help(State,Name,NewState):-
 expand((_,State,_),Result):-
   findall((Name,NewState,_),expand_help(State,Name,NewState),Result).
 
-%%%%%%%%%%%%%%%%%%%%%%%
-% Mengenoperationen   %
-%%%%%%%%%%%%%%%%%%%%%%%
+% Mengenoperationen
+%-------------------
 % differenzmenge(Menge_A, Menge_B, Differenzmenge)
 differenzmenge([], _, []).
 differenzmenge([Element|Tail], Menge, Rest) :-
