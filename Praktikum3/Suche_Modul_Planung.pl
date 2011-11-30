@@ -11,14 +11,17 @@ start_description([
   block(block1),
   block(block2),
   block(block3),
-  block(block4),  %mit Block4
+  block(block4),
+  block(block5),
+  block(block6),
   on(table,block2),
-  on(table,block3),
+  on(table,block6),
   on(block2,block1),
-  on(table,block4), %mit Block4
-  clear(block1),
+  on(block1,block4),
+  on(block4,block3),
+  on(block6,block5),
   clear(block3),
-  clear(block4), %mit Block4
+  clear(block5),
   handempty
   ]).
 
@@ -26,16 +29,21 @@ goal_description([
   block(block1),
   block(block2),
   block(block3),
-  block(block4), %mit Block4
-  on(block4,block2), %mit Block4
-  on(table,block3),
+  block(block4),
+  block(block5),
+  block(block6),
   on(table,block1),
-  on(block1,block4), %mit Block4
-  %on(block1,block2), %ohne Block4
+  on(table,block2),
+  on(table,block3),
+  on(block1,block4),
+  on(block4,block6),
+  on(block2,block5),
+  clear(block6),
+  clear(block5),
   clear(block3),
-  clear(block2),
   handempty
   ]).
+  
 
 % Definition des Startknotens
 start_node((start,_,_)).
