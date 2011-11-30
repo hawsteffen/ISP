@@ -43,13 +43,13 @@ start_description([
   block(block4),
   block(block5),
   block(block6),
-  on(table,block4),
+  on(table,block2),
   on(table,block6),
-  on(block4,block3),
-  on(block3,block2),
   on(block2,block1),
+  on(block1,block4),
+  on(block4,block3),
   on(block6,block5),
-  clear(block1),
+  clear(block3),
   clear(block5),
   handempty
   ]).
