@@ -7,39 +7,10 @@
 %   expand              ;Berechnung der Kind-Zustandsbeschreibungen
 %   eval-path           ;Bewertung eines Pfades
 
-start_description([
-  block(block1),
-  block(block2),
-  block(block3),
-  block(block4),
-  block(block5),
-  on(table,block1),
-  on(table,block3),
-  on(table,block4),
-  on(block1,block2),
-  on(block4,block5),
-  clear(block2),
-  clear(block3),
-  clear(block5),
-  handempty
-  ]).
+start_description(X):- start_new(4,X).
 
-goal_description([
-  block(block1),
-  block(block2),
-  block(block3),
-  block(block4),
-  block(block5),
-  on(table,block4),
-  on(table,block5),
-  on(block4,block2),
-  on(block2,block1),
-  on(block5,block3),
-  clear(block1),
-  clear(block3),
-  handempty
-  ]).
-  
+goal_description(X):- goal_new(4,X).
+
 
 % Definition des Startknotens
 start_node((start,_,_)).

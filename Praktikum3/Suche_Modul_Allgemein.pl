@@ -14,8 +14,8 @@ solve(Strategy):-
 solve(StartNode,Strategy) :-
   start_node(StartNode),
   search([[StartNode]],Strategy,Path),
-  reverse(Path,Path_in_correct_order),
-  write_solution(Path_in_correct_order).
+  reverse(Path,Path_in_correct_order).
+  %write_solution(Path_in_correct_order).
 
 
 

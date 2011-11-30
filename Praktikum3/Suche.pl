@@ -5,6 +5,7 @@
 
 
 :- consult('Suche_Modul_Informierte_Suche.pl').
+:- consult('Szenarien.pl').
 
 
 
