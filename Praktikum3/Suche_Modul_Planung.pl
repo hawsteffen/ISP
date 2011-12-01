@@ -120,30 +120,10 @@ action(put_on(Y,X),
 
 
 
-% Prueft, welche Aktionen vom momentanen Zustand aus möglich sind
-% TODO: Vielleicht zusammenfassen...?
+% Liefert Aktionen, die vom momentanen Zustand aus möglich sind
 %-----------------------------------------------------------------
 expand_help(State,Name,NewState):-
-  member(block(Block), State),
-  Name = pick_up(Block),
-  action(pick_up(Block), CondList, DelList, AddList),
-  ist_teilmenge(CondList,State),
-  differenzmenge(State,DelList,StateDel),
-  vereinigungsmenge(StateDel,AddList,NewState).
-  
-expand_help(State,Name,NewState):-
-  member(block(Block), State),
-  Name = put_on_table(Block),
-  action(put_on_table(Block), CondList, DelList, AddList),
-  ist_teilmenge(CondList,State),
-  differenzmenge(State,DelList,StateDel),
-  vereinigungsmenge(StateDel,AddList,NewState).
-  
-expand_help(State,Name,NewState):-
-  member(block(Block1), State),
-  member(block(Block2), State),
-  Name = put_on(Block1,Block2),
-  action(put_on(Block1,Block2), CondList, DelList, AddList),
+  action(Name, CondList, DelList, AddList),
   ist_teilmenge(CondList,State),
   differenzmenge(State,DelList,StateDel),
   vereinigungsmenge(StateDel,AddList,NewState).
