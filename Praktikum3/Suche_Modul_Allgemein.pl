@@ -14,8 +14,8 @@ solve(Strategy):-
 solve(StartNode,Strategy) :-
   start_node(StartNode),
   search([[StartNode]],Strategy,Path),
-  reverse(Path,Path_in_correct_order).
-  %write_solution(Path_in_correct_order).
+  reverse(Path,Path_in_correct_order),
+  write_solution(Path_in_correct_order).
 
 
 
@@ -92,9 +92,8 @@ write_fail(depth,[[(_,State)|_]|_]):-
 write_fail(_,_):-  nl,write('FAIL').
 
 % Alle Strategien: Keine neuen Pfade vorhanden
-insert_new_paths(_Strategy,[],OldPaths,OldPaths):-
-  %write_fail(Strategy,OldPaths),
-  !.
+insert_new_paths(Strategy,[],OldPaths,OldPaths):-
+  write_fail(Strategy,OldPaths),!.
 
 % Tiefensuche
 % Um interative Tiefensuche zu implementieren muesste man:
@@ -103,33 +102,33 @@ insert_new_paths(_Strategy,[],OldPaths,OldPaths):-
 % 2. Bei insert_new_paths(depth,...) muss geprueft werden, ob die Schranke
 %    schon erreicht wurde. Wenn ja, werden die neuen Pfade verworfen
 insert_new_paths(depth,NewPaths,OldPaths,AllPaths):-
-  append(NewPaths,OldPaths,AllPaths).
-  %write_action(NewPaths).
+  append(NewPaths,OldPaths,AllPaths),
+  write_action(NewPaths).
 
 % Breitensuche
 insert_new_paths(breadth,NewPaths,OldPaths,AllPaths):-
-  append(OldPaths,NewPaths,AllPaths).
-  %write_next_state(AllPaths),
-  %write_action(AllPaths).
+  append(OldPaths,NewPaths,AllPaths),
+  write_next_state(AllPaths),
+  write_action(AllPaths).
 
 % Optimistisches Bergsteigen
 insert_new_paths(hill_climbing,NewPaths,_,[BestPath]):-
   eval_paths(greedy,NewPaths),
-  insert_new_paths_informed(NewPaths,[],[BestPath|_]).
-  %write_action([BestPath]),
-  %write_state([BestPath]).
+  insert_new_paths_informed(NewPaths,[],[BestPath|_]),
+  write_action([BestPath]),
+  write_state([BestPath]).
 
 % Optimistisches Bergsteigen mit Backtracking
 insert_new_paths(hill_climbing_bt,NewPaths,OldPaths,AllPaths):-
   eval_paths(greedy,NewPaths),
   insert_new_paths_informed(NewPaths,[],SortedPaths),
-  append(SortedPaths,OldPaths,AllPaths).
-  %write_action(SortedPaths),
-  %write_state(SortedPaths).
+  append(SortedPaths,OldPaths,AllPaths),
+  write_action(SortedPaths),
+  write_state(SortedPaths).
 
-% Informierte Suche: A, Gierige Bestensuche
+% Informierte Suche: A, A*, Gierige Bestensuche
 insert_new_paths(Suchverfahren,NewPaths,OldPaths,AllPaths):-
   eval_paths(Suchverfahren,NewPaths),
-  insert_new_paths_informed(NewPaths,OldPaths,AllPaths).
-  %write_action(AllPaths),
-  %write_state(AllPaths).
+  insert_new_paths_informed(NewPaths,OldPaths,AllPaths),
+  write_action(AllPaths),
+  write_state(AllPaths).

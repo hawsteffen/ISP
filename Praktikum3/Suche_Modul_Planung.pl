@@ -7,9 +7,9 @@
 %   expand              ;Berechnung der Kind-Zustandsbeschreibungen
 %   eval-path           ;Bewertung eines Pfades
 
-start_description(X):- start_new(4,X).
+start_description(X):- start_new(5,X).
 
-goal_description(X):- goal_new(4,X).
+goal_description(X):- goal_new(5,X).
 
 
 % Definition des Startknotens
@@ -53,9 +53,14 @@ eval_path(Suchverfahren,Path):-
 % Die Suchverfahren unterscheiden sich eigentlich nur
 % darin, wie der Value (f(n)) berechnet wird
 
-% A: weil unsere Heuristik überschätzen kann
+% A
 eval_state(a,[(_,State,Value)|_],G) :-
   heuristik(wrong_pos,State,Heuristik),
+  Value is Heuristik + G.
+  
+% A*
+eval_state(astar,[(_,State,Value)|_],G) :-
+  heuristik(wrong_pos_astar,State,Heuristik),
   Value is Heuristik + G.
   
 % Gierige Bestensuche
@@ -73,11 +78,20 @@ heuristik(right_pos,State,Value) :-
   length(Ziel,AnzZiel),
   Value is (AnzZiel - AnzSchnitt).
   
-% Anzahl der Elemente, die noch an der falschen Position sind
+% Anzahl der Elemente des Ziels, die noch an der falschen Position sind.
 heuristik(wrong_pos,State,Value) :-
   goal_description(Ziel),
-  differenzmenge(State,Ziel,Differenz),
+  differenzmenge(Ziel,State,Differenz),
   length(Differenz,Value).
+  
+% Anzahl der Elemente des Ziels, die noch an der falschen Position sind.
+% Dieser Wert wird am Ende noch durch 3 geteilt, um ein ueberschaetzen zu
+% verhindern (es koenne max. 3 Ziele pro Schritt erreicht werden, s. AddList)
+heuristik(wrong_pos_astar,State,Value) :-
+  goal_description(Ziel),
+  differenzmenge(Ziel,State,Differenz),
+  length(Differenz,BetragDifferenz),
+  ceiling(BetragDifferenz / 3,Value).
 
 % Entfernung zum Ziel immer 0 (=Uniformierte Breitensuche)
 heuristik(zero,_,0).
