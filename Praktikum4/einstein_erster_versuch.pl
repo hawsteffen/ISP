@@ -51,7 +51,7 @@ bew_getraenk_constr(_,_) :- true.
 % 4
 links_constr(gruen,P1,weiss,P2) :- P1 = P2 - 1.
 links_constr(gruen,P1,weiss,P2) :- P1 >= P2, !, fail.
-links_constr(_,P1,_,P2) :- P1 = P2 - 1.
+links_constr(_,_,_,_) :- true.
 
 % 5
 farbe_getraenk_constr(gruen,kaffee).
