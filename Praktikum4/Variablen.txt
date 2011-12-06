@@ -1,0 +1,6 @@
+Variable:
+----------
+1. 30 Vars. je 5 Personen, 5 Häuser, ...
+2. 5 Vars. Je ein 6-Tupel (Person, Farbe, Tier,...)
+3. 6 Vars. Alle Adjektive (lebt, raucht, trinkt,...) z.b. lebt(Brite,rot)
+4. 30 Vars. wie 3., nur für jedes Adj. 5 Versionen
