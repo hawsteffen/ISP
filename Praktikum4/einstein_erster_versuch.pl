@@ -12,7 +12,7 @@ einstein(B,T,F,Z,G,P) :-
                       bew_farbe_constr(B,F),
                       bew_tier_constr(B,T),
                       bew_getraenk_constr(B,G),
-                      %links_constr(F,P,_,_),
+                      farbe_position_constr(F,P),
                       farbe_getraenk_constr(F,G),
                       tier_zigaretten_constr(T,Z),
                       getraenk_position_constr(G,P),
@@ -55,6 +55,8 @@ bew_getraenk_constr(daene,_) :- !, fail.
 bew_getraenk_constr(_,_) :- true.
 
 % 4
+farbe_position_constr(weiss,1):- !,fail.
+farbe_position_constr(gruen,5):- !,fail.
 %links_constr(gruen,P1,weiss,P2) :- P1 = P2 - 1.
 %links_constr(gruen,P1,weiss,P2) :- P1 >= P2, !, fail.
 %links_constr(_,_,_,_) :- true.
