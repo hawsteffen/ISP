@@ -9,23 +9,58 @@ solve :-
 
 einstein(NationM,FarbenM,GetraenkM,TierM,ZigarrenM) :-
                                                     matrix(NationM),
-                                                    
-                                                    % 1: der Norweger wohnt im ersten Haus
+                                                    % 1: der Norweger(3) wohnt im ersten Haus(1)
                                                     sum(NationM,3,1),
-                                                    
-
                                                     matrix(FarbenM),
+                                                    % 10: The green house(2) is situated immediately to the left of the white house(5)
+                                                    sum(FarbenM,2,X10),
+                                                    sum(FarbenM,5,Y10),
+                                                    Y10 is X10+1,
+                                                    % 11: The British person(1) lives in the red house(1)
+                                                    sum(NationM,1,X11),
+                                                    sum(FarbenM,1,X11),
+                                                    % 15: The Norwegian(3) lives next to the blue house(4)
+                                                    sum(NationM,3,X15),
+                                                    sum(FarbenM,3,Y15),
+                                                    abs(X15-Y15,1),
                                                     matrix(GetraenkM),
-                                                    
-                                                    % 2: die Person im mittleren Haus trinkt Milch
+                                                    % 2: die Person im mittleren Haus(3) trinkt Milch(5)
                                                     sum(GetraenkM,5,3),
-                                                    
-                                                    matrix(TierM),
+                                                    % 4: The person living in green house(2) drinks coffee(2).
+                                                    sum(FarbenM,2,X4),
+                                                    sum(GetraenkM,2,X4),
+                                                    % 5: The Dane(2) drinks tea(1)
+                                                    sum(NationM,2,X5),
+                                                    sum(GetraenkM,1,X5),
                                                     matrix(ZigarrenM),
-                                                    
-                                                    % 3: Person living in the yellow house smokes Dunhill
-                                                    sum(FarbenM,3,X),
-                                                    sum(ZigarrenM,2,X).
+                                                    % 3: Person living in the yellow house(3) smokes Dunhill(2)
+                                                    sum(FarbenM,3,X3),
+                                                    sum(ZigarrenM,2,X3),
+                                                    % 6: The German(4) smokes Prince(5)
+                                                    sum(NationM,4,X6),
+                                                    sum(ZigarrenM,5,X6),
+                                                    % 8: The beer drinker(3) smokes BlueMaster(3)
+                                                    sum(GetraenkM,3,X8),
+                                                    sum(ZigarrenM,3,X8),
+                                                    matrix(TierM),
+                                                    % 7: The Swede(5) has a dog(3)
+                                                    sum(NationM,5,X7),
+                                                    sum(TierM,3,X7),
+                                                    %9: The bird owner(1) smokes Pall Mall(1)
+                                                    sum(TierM,1,X9),
+                                                    sum(ZigarrenM,1,X9),
+                                                    % 12: The person who smokes Blend(4) lives next to the one who keeps cats(4)
+                                                    sum(ZigarrenM,4,X12),
+                                                    sum(TierM,4,Y12),
+                                                    abs(X12-Y12,1),
+                                                    % 13: The person who keeps horses(2) lives next to the person who smokes Dunhill(2)
+                                                    sum(TierM,2,Y13),
+                                                    sum(ZigarrenM,2,X13),
+                                                    abs(X13-Y13,1),
+                                                    % 14: The person who smokes Blend(4) has a neighbour who drinks water(4)
+                                                    sum(ZigarrenM,4,X14),
+                                                    sum(GetraenkM,4,Y14),
+                                                    abs(X14-Y14,1).
 
 
                                                     
@@ -56,8 +91,8 @@ write_houses([Nationen|RestN],[Farben|RestF],[Getraenke|RestG],[Tiere|RestT],[Zi
        tier(PosT,Tier),
        gib_position(Zigarren,PosZ),
        zigarre(PosZ,Zigarre),
-       write('Haus('),write(Hnr),
-       write(','),write(Nation),
+       write('Haus'),write(Hnr),
+       write(': ('),write(Nation),
        write(','),write(Farbe),
        write(','),write(Getraenk),
        write(','),write(Tier),
@@ -100,6 +135,6 @@ tier(5,fisch).
 
 zigarre(1,pallmall).
 zigarre(2,dunhill).
-zigarre(3,blumaster).
+zigarre(3,bluemaster).
 zigarre(4,blend).
 zigarre(5,prince).
