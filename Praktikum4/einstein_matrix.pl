@@ -21,7 +21,7 @@ einstein(NationM,FarbenM,GetraenkM,TierM,ZigarrenM) :-
                                                     sum(FarbenM,1,X11),
                                                     % 15: The Norwegian(3) lives next to the blue house(4)
                                                     sum(NationM,3,X15),
-                                                    sum(FarbenM,3,Y15),
+                                                    sum(FarbenM,4,Y15),
                                                     abs(X15-Y15,1),
                                                     matrix(GetraenkM),
                                                     % 2: die Person im mittleren Haus(3) trinkt Milch(5)
