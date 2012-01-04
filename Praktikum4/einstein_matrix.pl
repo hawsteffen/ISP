@@ -79,20 +79,24 @@ einstein(NationM,FarbenM,GetraenkM,TierM,ZigarrenM) :-
                                                     abs(X14-Y14,1).
 
 
-                                                    
+% Summiert die Werte einer Spalte multipliziert mit der Position des Wertes
+% Beispiel
+% sum(M,3,2) bedeutet: in Matrix M in Spalte 3 steht an der Position 2 der Wert 1.
+% Die Werte an allen anderen Positionen sind laut Vorbedingung 0.
 sum(Matrix,Spalte,Ergebnis) :- sum(Matrix,Spalte,Ergebnis,1,0).
 
 sum([[]],_,Ergebnis,_,Ergebnis).
-%sum([],_,_,_,_) :- !,fail.
 sum([Zeile|Rest],Spalte,Ergebnis,I,Sum) :-
                                     ergebnis_zeile(Zeile,Spalte,I,ErgebnisZeile),
                                     Sum2 is Sum + ErgebnisZeile,
                                     I2 is I+1,
                                     sum(Rest,Spalte,Ergebnis,I2,Sum2).
 
-ergebnis_zeile([Feld|_],1,I,ErgebnisZeile) :- ErgebnisZeile is Feld * I.
-ergebnis_zeile([_|Rest],Spalte,I,ErgebnisZeile) :-
-                                                Spalte2 is Spalte-1,
-                                                ergebnis_zeile(Rest,Spalte2,I,ErgebnisZeile).
+% Berechnet (WertDesFeldes * ZeilenNr) für jede Zeile
+ergebnis_zeile(Zeile,Spalte,I,ErgebnisZeile) :- ergebnis_zeile(Zeile,Spalte,1,I,ErgebnisZeile).
+ergebnis_zeile([Feld|_],Spalte,Spalte,I,ErgebnisZeile) :- ErgebnisZeile is Feld * I.
+ergebnis_zeile([_|Rest],Spalte,SpalteAktuell,I,ErgebnisZeile) :-
+                                                SpalteAktuell2 is SpalteAktuell+1,
+                                                ergebnis_zeile(Rest,Spalte,SpalteAktuell2,I,ErgebnisZeile).
 
 
